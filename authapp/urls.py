@@ -16,22 +16,24 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth.models import User
-from rest_framework import routers, serializers, viewsets
+from rest_framework import routers, serializers, viewsets, permissions
+
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['url', 'username', 'email', 'is_staff']
+        fields = ['url', 'username', 'email', 'first_name', 'is_staff']
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
 
 routers = routers.DefaultRouter()
-routers.register(r'users', UserViewSet)
+routers.register(r'_users', UserViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
